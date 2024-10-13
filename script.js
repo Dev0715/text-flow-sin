@@ -3,9 +3,10 @@ const flowingImageHref =
   "https://box11.domaineinternet.ca/~cliniqueautrem/wp-content/uploads/2024/09/blob-sourire.svg";
 const flowingTextId = "text-flowing";
 // const flowingPathId = "path-flowing";
-const animationSpeed = -1;
+const animationSpeed = 1;
 const repeatedCount = 10;
 const hiddenSpanSize = 50;
+const animationInterval = 10;
 
 document.addEventListener("DOMContentLoaded", startMarquee);
 
@@ -14,22 +15,17 @@ function startMarquee() {
   flowingTextEl.innerHTML = duplicateTextContent(flowingText, repeatedCount);
   createImages();
 
-  const tSpanSpaceEl = document.getElementById(`tspan-${0}`);
-  const rect = tSpanSpaceEl.getBoundingClientRect();
-  const pathLength = 1383; //rect.width;
-  console.log(rect, pathLength);
-
+  const pathLength = getTSpanWidth();
   let offset = 0;
+
   setInterval(() => {
-    offset -= animationSpeed;
-    if (offset < 0) {
-      offset = pathLength;
-    } else if (offset > pathLength) {
+    offset += animationSpeed;
+    if (offset > pathLength) {
       offset = 0;
     }
     flowingTextEl.setAttribute("startOffset", `${offset}px`);
     animateImages();
-  }, 10);
+  }, animationInterval);
 }
 
 function duplicateTextContent(textContent, count) {
@@ -48,42 +44,58 @@ function createImages() {
     const tSpanSpaceEl = document.getElementById(`tspan-space-${i}`);
     const spaceRect = tSpanSpaceEl.getBoundingClientRect();
 
-    const imgEl = document.createElement("img");
-    imgEl.id = `img-${i}`;
-    imgEl.src = flowingImageHref;
-    imgEl.style.position = "absolute";
-    imgEl.style.left = spaceRect.left + spaceRect.width / 2 - 9 - 9 + "px";
-    imgEl.style.top = spaceRect.top + spaceRect.height / 2 - 9 - 6 + "px";
-    imgEl.width = 18;
-    imgEl.height = 18;
-    imgEl.alt = "alt";
+    if (
+      spanRect.width > hiddenSpanSize &&
+      spanRect.right - 32 < window.innerWidth
+    ) {
+      const imgEl = document.createElement("img");
+      imgEl.id = `img-${i}`;
+      imgEl.src = flowingImageHref;
+      imgEl.style.position = "absolute";
+      imgEl.style.left = spaceRect.left + spaceRect.width / 2 - 9 - 9 + "px";
+      imgEl.style.top = spaceRect.top + spaceRect.height / 2 - 9 - 6 + "px";
+      imgEl.width = 18;
+      imgEl.height = 18;
+      imgEl.alt = "alt";
 
-    if (spanRect.width < 50) {
-      imgEl.style.display = "none";
+      imagesContainer.appendChild(imgEl);
     }
-
-    imagesContainer.appendChild(imgEl);
   }
 }
 
-function animateImages() {
+function getTSpanWidth() {
+  let maxWidth = 0;
   for (let i = 0; i < repeatedCount; i++) {
-    const tSpanEl = document.getElementById(`tspan-${i}`);
-    const spanRect = tSpanEl.getBoundingClientRect();
-    const tSpanSpaceEl = document.getElementById(`tspan-space-${i}`);
-    const spaceRect = tSpanSpaceEl.getBoundingClientRect();
-    const imgEl = document.getElementById(`img-${i}`);
-
-    imgEl.style.left = spaceRect.left + spaceRect.width / 2 - 9 - 9 + "px";
-    imgEl.style.top = spaceRect.top + spaceRect.height / 2 - 9 - 6 + "px";
-
-    // console.log(spaceRect);
-
-    if (spaceRect.width < 50 && imgEl.style.display !== "none") {
-      imgEl.style.display = "none";
-    }
-    if (spanRect.width > 50 && imgEl.style.display === "none") {
-      imgEl.style.display = "block";
+    const tSpanSpaceEl = document.getElementById(`tspan-${i}`);
+    const rect = tSpanSpaceEl.getBoundingClientRect();
+    if (rect.width > maxWidth) {
+      maxWidth = rect.width;
     }
   }
+  return maxWidth;
+}
+
+function animateImages() {
+  const imagesContainer = document.getElementById("images-container");
+  imagesContainer.innerHTML = "";
+  createImages();
+
+  // for (let i = 0; i < repeatedCount; i++) {
+  //   const tSpanEl = document.getElementById(`tspan-${i}`);
+  //   const spanRect = tSpanEl.getBoundingClientRect();
+
+  //   const tSpanSpaceEl = document.getElementById(`tspan-space-${i}`);
+  //   const spaceRect = tSpanSpaceEl.getBoundingClientRect();
+  //   const imgEl = document.getElementById(`img-${i}`);
+
+  //   if (spaceRect.width < hiddenSpanSize && imgEl.style.display !== "none") {
+  //     imgEl.style.display = "none";
+  //   }
+  //   if (spanRect.width > hiddenSpanSize && imgEl.style.display === "none") {
+  //     imgEl.style.display = "block";
+  //   }
+
+  //   imgEl.style.left = spaceRect.left + spaceRect.width / 2 - 9 - 9 + "px";
+  //   imgEl.style.top = spaceRect.top + spaceRect.height / 2 - 9 - 6 + "px";
+  // }
 }

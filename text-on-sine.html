@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sine Wave Text Display</title>
+    <style>
+      body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        background-color: #f0f0f0;
+        font-family: Arial, sans-serif;
+      }
+      #sine-container {
+        position: relative;
+        width: 100%;
+        height: 300px;
+        overflow: hidden;
+        background: white;
+        border: 1px solid #ccc;
+      }
+      .letter {
+        position: absolute;
+        font-size: 24px;
+        color: #333;
+        white-space: nowrap;
+        transform-origin: center; /* Center for rotation */
+      }
+    </style>
+  </head>
+  <body>
+    <div id="sine-container">
+      <canvas id="sine-canvas"></canvas>
+    </div>
+
+    <script>
+      const container = document.getElementById("sine-container");
+      const canvas = document.getElementById("sine-canvas");
+      const ctx = canvas.getContext("2d");
+      const text = "Text flowing on the sine wave!";
+      const amplitude = 100; // Height of the wave
+      const frequency = 0.006; // Wave frequency
+
+      // Set canvas dimensions
+      canvas.width = container.offsetWidth;
+      canvas.height = container.offsetHeight;
+
+      // Function to draw the sine wave
+      function drawSineWave() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.beginPath();
+        ctx.moveTo(0, canvas.height / 2);
+
+        for (let x = 0; x < canvas.width; x++) {
+          const y = amplitude * Math.sin(frequency * x) + canvas.height / 2;
+          ctx.lineTo(x, y);
+        }
+
+        ctx.strokeStyle = "#007BFF";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      }
+
+      let positionX = 0;
+      // Create letter elements
+      text.split("").forEach((char, index) => {
+        const letter = document.createElement("span");
+        letter.textContent = char;
+        letter.className = "letter";
+
+        // Calculate horizontal position
+        const x = positionX; // Adjust spacing between letters
+
+        // Calculate vertical position using sine function
+        const y = amplitude * Math.sin(frequency * x) + canvas.height / 2;
+
+        // Calculate the slope for rotation
+        const slope = amplitude * frequency * Math.cos(frequency * x);
+        const angle = Math.atan(slope) * (180 / Math.PI); // Convert to degrees
+
+        // Set styles
+        letter.style.left = `${x}px`;
+        letter.style.top = `${y}px`;
+        letter.style.transform = `rotate(${angle}deg)`;
+
+        container.appendChild(letter);
+        positionX += letter.offsetWidth;
+      });
+
+      // Draw the sine wave on the canvas
+      drawSineWave();
+    </script>
+  </body>
+</html>
